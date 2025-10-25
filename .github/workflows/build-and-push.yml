@@ -8,10 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      MYSQL_REPO: mysql-repo
-      APP_REPO: webapp-repo
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,7 +18,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ secrets.AWS_REGION }}   # must be "us-east-1" for your repos
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to ECR
         id: login-ecr
@@ -30,12 +26,12 @@ jobs:
 
       - name: Build, Tag & Push MySQL
         run: |
-          docker build -t mysql-img -f Dockerfile_mysql .
-          docker tag mysql-img:latest $ECR_REGISTRY/$MYSQL_REPO:latest
-          docker push $ECR_REGISTRY/$MYSQL_REPO:latest
+          docker build -t mysql-repo -f Dockerfile_mysql .
+          docker tag mysql-repo:latest ${{ steps.login-ecr.outputs.registry }}/mysql-repo:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/mysql-repo:latest
 
       - name: Build, Tag & Push App
         run: |
-          docker build -t app-img -f Dockerfile .
-          docker tag app-img:latest $ECR_REGISTRY/$APP_REPO:latest
-          docker push $ECR_REGISTRY/$APP_REPO:latest
+          docker build -t webapp-repo -f Dockerfile .
+          docker tag webapp-repo:latest ${{ steps.login-ecr.outputs.registry }}/webapp-repo:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/webapp-repo:latest
