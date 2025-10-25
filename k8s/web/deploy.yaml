@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deploy
+  namespace: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: employees
+  template:
+    metadata:
+      labels:
+        app: employees
+    spec:
+      containers:
+      - name: web
+        image: 851725335686.dkr.ecr.us-east-1.amazonaws.com/webapp-repo:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DBHOST
+          value: "mysql-svc.db.svc.cluster.local"
+        - name: DBPORT
+          value: "3306"
+        - name: DBUSER
+          value: "root"
+        - name: DBPWD                # <-- match your MySQL root password
+          value: "pass123"
+        - name: DATABASE
+          value: "employees"
+        # Optional: color banner if your app uses it
+        - name: APP_COLOR
+          value: "blue"

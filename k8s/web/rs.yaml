@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: web-rs
+  namespace: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: employees
+  template:
+    metadata:
+      labels:
+        app: employees
+    spec:
+      containers:
+      - name: web
+        image: 851725335686.dkr.ecr.us-east-1.amazonaws.com/webapp-repo:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
